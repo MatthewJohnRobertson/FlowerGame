@@ -23,7 +23,7 @@ var myGameArea = {
 };
 
 
-
+// LOAD IMAGES START GAME LOOP
 loadImages(sources, function (images) {
     myGameArea.start();
     player = new Player(images.player);
