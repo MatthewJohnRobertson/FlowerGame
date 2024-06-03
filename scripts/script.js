@@ -187,3 +187,6 @@ function loadImages(sources, callback) {
     }
 }
 
+
+
+// TEST
