@@ -5,11 +5,12 @@ let oldTimeStamp = 0;
 let timePassed = 0;
 
 
+
 var myGameArea = {
     canvas: document.createElement("canvas"),
     start: function () {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
+        this.canvas.width = 1080;
+        this.canvas.height = 720;
         this.context = this.canvas.getContext("2d");
         navElement.parentNode.insertBefore(this.canvas, navElement.nextSibling);
         this.globalCompositeOperation = "destination-over";
@@ -21,7 +22,6 @@ var myGameArea = {
         this.context.fillRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
     },
 };
-
 
 // LOAD IMAGES START GAME LOOP
 loadImages(sources, function (images) {
@@ -44,8 +44,6 @@ function gameLoop(timeStamp) {
     player.draw();
 
 
-
-
     // passed the time to update
     update(secondsPassed);
 
@@ -56,8 +54,7 @@ function gameLoop(timeStamp) {
 function update(secondsPassed) {
 
     timePassed += secondsPassed;
-    player.update(timePassed);
-    player.jump();
+    player.update();
 }
 
 // CONTROLS
@@ -83,6 +80,7 @@ function keyDown(event) {
 
 function keyUp(event) {
     let key = keyMap[event.keyCode];
+    console.log(key);
     keyPress[key] = false;
 }
 
@@ -92,8 +90,8 @@ window.addEventListener("keyup", keyUp, false);
 // PLAYER DEFINITION
 function Player(image) {
     this.image = image;
-    this.pX = myGameArea.canvas.width / 2;
-    this.pY = myGameArea.canvas.height;
+    this.position = { X: 580, Y: 360 };
+    this.velocity = { X: 0, Y: 1 };
     this.img = image;
     this.width = 32;
     this.height = 32;
@@ -101,11 +99,10 @@ function Player(image) {
     this.scale = 1;
     this.scaledWidth = this.scale * this.width;
     this.scaledHeight = this.scale * this.height;
-    this.jumpFrames = 0;
     this.isJumping = false;
-    this.jumpSpeed = -1.5;
-    this.gravity = 0.05;
-    this.gravitySpeed = 0;
+    this.jumpForce = -50;
+    this.gravity = 1;
+    this.maxJumpHeight = -200;
 
     this.draw = function () {
         myGameArea.context.drawImage(
@@ -125,10 +122,10 @@ function Player(image) {
             this.height,
 
             // Sideways Player position on canvas
-            this.pX,
+            this.position.X,
 
             // Up and down Player position on canvas
-            this.pY,
+            this.position.Y,
 
             // The scaled width of Player
             this.scaledWidth,
@@ -141,30 +138,25 @@ function Player(image) {
 
 
     this.update = function () {
+        this.isJumping = false;
         const distance = this.speed;
-        this.pX = Math.max(0, Math.min(myGameArea.canvas.width - this.width, this.pX));
-        this.pY = Math.max(0, Math.min(myGameArea.canvas.height - this.height, this.pY));
+        this.position.Y += this.velocity.Y;
+        this.position.X += this.velocity.X;
+        this.position.X = Math.max(0, Math.min(myGameArea.canvas.width - this.width, this.position.X));
+        this.position.Y = Math.max(0, Math.min(myGameArea.canvas.height - this.height - 5, this.position.Y));
 
 
 
         if (keyPress.left) {
-            this.pX -= distance;
+            this.position.X -= distance;
         }
 
         if (keyPress.right) {
-            this.pX += distance;
+            this.position.X += distance;
         }
 
-    };
-
-    this.jump = function () {
-        if (this.isJumping) {
-
-            if (this.jumpFrames < 50) {
-                this.Ypos += this.jumpSpeed;
-            }
-        }
     }
+
 };
 
 
@@ -186,7 +178,3 @@ function loadImages(sources, callback) {
         images[src].src = sources[src];
     }
 }
-
-
-
-// TEST
