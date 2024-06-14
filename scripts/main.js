@@ -1,8 +1,13 @@
+import "./inputControls.js";
+
+
 var navElement = document.getElementById('topnav');
 let sources = { player: "../imgs/FlowerMan.png", enemy: "../imgs/EnemyBlob.png" };
 let secondsPassed = 0;
 let oldTimeStamp = 0;
 let timePassed = 0;
+export let player;
+
 
 
 
@@ -50,6 +55,9 @@ function gameLoop(timeStamp) {
     window.requestAnimationFrame(gameLoop);
 
 }
+
+
+
 // GAME LOGIC LOOP
 function update(secondsPassed) {
 
@@ -57,38 +65,10 @@ function update(secondsPassed) {
     player.update();
 }
 
-// CONTROLS
-let keyPress = {
-    left: false,
-    right: false,
-    up: false,
-    down: false
-}
 
-let keyMap = {
-    68: "right",
-    65: "left",
-    87: "up",
-    83: "down",
-}
-
-
-function keyDown(event) {
-    let key = keyMap[event.keyCode];
-    keyPress[key] = true;
-}
-
-function keyUp(event) {
-    let key = keyMap[event.keyCode];
-    console.log(key);
-    keyPress[key] = false;
-}
-
-window.addEventListener("keydown", keyDown, false);
-window.addEventListener("keyup", keyUp, false);
 
 // PLAYER DEFINITION
-function Player(image) {
+export function Player(image) {
     this.image = image;
     this.position = { X: 580, Y: 360 };
     this.velocity = { X: 0, Y: 1 };
@@ -136,24 +116,20 @@ function Player(image) {
     };
 
 
-
+    // Updates player physics
     this.update = function () {
-        this.isJumping = false;
+
+
         const distance = this.speed;
         this.position.Y += this.velocity.Y;
         this.position.X += this.velocity.X;
+
+        // Stops player leaving the screen
         this.position.X = Math.max(0, Math.min(myGameArea.canvas.width - this.width, this.position.X));
         this.position.Y = Math.max(0, Math.min(myGameArea.canvas.height - this.height - 5, this.position.Y));
 
 
 
-        if (keyPress.left) {
-            this.position.X -= distance;
-        }
-
-        if (keyPress.right) {
-            this.position.X += distance;
-        }
 
     }
 
@@ -178,3 +154,5 @@ function loadImages(sources, callback) {
         images[src].src = sources[src];
     }
 }
+
+
