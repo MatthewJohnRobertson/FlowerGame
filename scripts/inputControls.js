@@ -26,11 +26,28 @@ export function updatePlayerVelocity(player, deltaTime) {
     // Apply friction
     player.velocity.X *= player.friction;
 
+    // // Handle jumping
+    // if (keysPressed.up && player.onGround) {
+    //     player.velocity.Y = player.jumpSpeed;
+    //     player.onGround = false;
+    // }
+
     // Handle jumping
-    if (keysPressed.up && player.onGround) {
-        player.velocity.Y = player.jumpSpeed;
-        player.onGround = false;
+    if (keysPressed.up) {
+        if (player.onGround) {
+            player.velocity.Y = player.jumpSpeed;
+            player.onGround = false;
+            player.jumpTime = 0;
+        } else if (player.jumpTime < player.maxJumpTime) {
+            // Continue applying upward force if jump is held
+            player.velocity.Y += player.jumpSpeed * deltaTime * 2;
+            player.jumpTime += deltaTime;
+        }
+    } else {
+        // If jump key is released, stop adding upward force
+        player.jumpTime = player.maxJumpTime;
     }
+
 }
 
 function keyDown(event) {

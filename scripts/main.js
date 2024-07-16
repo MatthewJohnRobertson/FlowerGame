@@ -81,9 +81,12 @@ export function Player(image) {
     this.scaledWidth = this.scale * this.width;
     this.scaledHeight = this.scale * this.height;
     this.isJumping = false;
-    this.jumpSpeed = -8000;
+    this.jumpSpeed = -150;
+    this.maxJumpTime = 0.3;
+    this.jumpTime = 0;
     this.onGround;
-    this.acceleration = 50;
+    this.gravity = 10;
+    this.acceleration = 30;
     this.friction = 0.9;
 
     this.draw = function () {
@@ -134,13 +137,14 @@ export function Player(image) {
             this.position.Y = myGameArea.canvas.height - this.height;
             this.onGround = true;
             this.velocity.Y = 0;
+            this.jumpTime = 0;
         } else {
             this.onGround = false;
         }
 
         // Apply gravity if not on ground
         if (!this.onGround) {
-            this.velocity.Y += 980 * deltaTime; // Gravity
+            this.velocity.Y += this.gravity * deltaTime; // Gravity
         }
     }
 };
