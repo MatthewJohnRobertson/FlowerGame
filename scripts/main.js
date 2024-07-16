@@ -1,12 +1,14 @@
-import "./inputControls.js";
+// import "./inputControls.js";
+import { updatePlayerVelocity } from "./inputControls.js";
 
 
 var navElement = document.getElementById('topnav');
 let sources = { player: "../imgs/FlowerMan.png", enemy: "../imgs/EnemyBlob.png" };
 let secondsPassed = 0;
-let oldTimeStamp = 0;
-let timePassed = 0;
+let lastTime = 0;
+const fixedDeltaTime = 1 / 165;
 export let player;
+
 
 
 
@@ -37,10 +39,10 @@ loadImages(sources, function (images) {
 });
 
 // GAME LOOP
-function gameLoop(timeStamp) {
+function gameLoop(currentTime) {
     //calculate how much time has passed
-    secondsPassed = (timeStamp - oldTimeStamp) / 1000;
-    oldTimeStamp = timeStamp;
+    let deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
 
 
     myGameArea.clear();
@@ -50,7 +52,7 @@ function gameLoop(timeStamp) {
 
 
     // passed the time to update
-    update(secondsPassed);
+    update(deltaTime);
 
     window.requestAnimationFrame(gameLoop);
 
@@ -59,10 +61,9 @@ function gameLoop(timeStamp) {
 
 
 // GAME LOGIC LOOP
-function update(secondsPassed) {
+function update(deltaTime) {
 
-    timePassed += secondsPassed;
-    player.update();
+    player.update(deltaTime);
 }
 
 
@@ -71,7 +72,7 @@ function update(secondsPassed) {
 export function Player(image) {
     this.image = image;
     this.position = { X: 580, Y: 360 };
-    this.velocity = { X: 0, Y: 1 };
+    this.velocity = { X: 0, Y: 480 };
     this.img = image;
     this.width = 32;
     this.height = 32;
@@ -80,9 +81,10 @@ export function Player(image) {
     this.scaledWidth = this.scale * this.width;
     this.scaledHeight = this.scale * this.height;
     this.isJumping = false;
-    this.jumpForce = -50;
-    this.gravity = 1;
-    this.maxJumpHeight = -200;
+    this.jumpSpeed = -8000;
+    this.onGround;
+    this.acceleration = 50;
+    this.friction = 0.9;
 
     this.draw = function () {
         myGameArea.context.drawImage(
@@ -117,22 +119,30 @@ export function Player(image) {
 
 
     // Updates player physics
-    this.update = function () {
+    this.update = function (deltaTime) {
+        updatePlayerVelocity(this, deltaTime);
 
-
-        const distance = this.speed;
-        this.position.Y += this.velocity.Y;
-        this.position.X += this.velocity.X;
+        this.position.Y += this.velocity.Y * fixedDeltaTime;
+        this.position.X += this.velocity.X * fixedDeltaTime;
 
         // Stops player leaving the screen
         this.position.X = Math.max(0, Math.min(myGameArea.canvas.width - this.width, this.position.X));
-        this.position.Y = Math.max(0, Math.min(myGameArea.canvas.height - this.height - 5, this.position.Y));
+        this.position.Y = Math.max(0, Math.min(myGameArea.canvas.height - this.height, this.position.Y));
 
+        // Ground check
+        if (this.position.Y >= myGameArea.canvas.height - this.height) {
+            this.position.Y = myGameArea.canvas.height - this.height;
+            this.onGround = true;
+            this.velocity.Y = 0;
+        } else {
+            this.onGround = false;
+        }
 
-
-
+        // Apply gravity if not on ground
+        if (!this.onGround) {
+            this.velocity.Y += 980 * deltaTime; // Gravity
+        }
     }
-
 };
 
 
@@ -155,4 +165,7 @@ function loadImages(sources, callback) {
     }
 }
 
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
 

@@ -1,56 +1,49 @@
-
 import { player } from './main.js';
-// CONTROLS
-let keyPress = {
-    left: false,
-    right: false,
-    up: false,
-    down: false
-}
 
 let keyMap = {
     68: "right",
     65: "left",
     87: "up",
     83: "down",
-}
+};
 
+let keysPressed = {
+    right: false,
+    left: false,
+    up: false,
+    down: false
+};
+
+export function updatePlayerVelocity(player, deltaTime) {
+    // Apply acceleration based on key presses
+    if (keysPressed.right) {
+        player.velocity.X += player.acceleration * deltaTime;
+    }
+    if (keysPressed.left) {
+        player.velocity.X -= player.acceleration * deltaTime;
+    }
+
+    // Apply friction
+    player.velocity.X *= player.friction;
+
+    // Handle jumping
+    if (keysPressed.up && player.onGround) {
+        player.velocity.Y = player.jumpSpeed;
+        player.onGround = false;
+    }
+}
 
 function keyDown(event) {
     let key = keyMap[event.keyCode];
-    // console.log(keyPress[key]);
-    if (key == "right") {
-        player.velocity.X += 5;
-        // console.log(player.velocity.X);
+    if (key) {
+        keysPressed[key] = true;
     }
-
-    if (key == "left") {
-        player.velocity.X -= 5;
-        // console.log(player.velocity.X);
-    }
-
-    if (key == "up") {
-        player.velocity.Y -= 5;
-    }
-    // if (keyPress[])
-
-    // keyPress[key] = true;
 }
 
 function keyUp(event) {
     let key = keyMap[event.keyCode];
-    if (key == "right") {
-        player.velocity.X = 0;
-        // console.log(player.velocity.X);
-    }
-
-    if (key == "left") {
-        player.velocity.X = 0;
-        // console.log(player.velocity.X);
-    }
-
-    if (key == "up") {
-        player.velocity.Y = 1w;
+    if (key) {
+        keysPressed[key] = false;
     }
 }
 
