@@ -1,4 +1,4 @@
-import { player } from './main.js';
+
 
 let keyMap = {
     68: "right",
@@ -14,12 +14,15 @@ let keysPressed = {
     down: false
 };
 
-export function updatePlayerVelocity(player, deltaTime) {
+export function updatePlayerVelocity(player, deltaTime)
+{
     // Apply acceleration based on key presses
-    if (keysPressed.right) {
+    if (keysPressed.right)
+    {
         player.velocity.X += player.acceleration * deltaTime;
     }
-    if (keysPressed.left) {
+    if (keysPressed.left)
+    {
         player.velocity.X -= player.acceleration * deltaTime;
     }
 
@@ -33,33 +36,41 @@ export function updatePlayerVelocity(player, deltaTime) {
     // }
 
     // Handle jumping
-    if (keysPressed.up) {
-        if (player.onGround) {
+    if (keysPressed.up)
+    {
+        if (player.onGround)
+        {
             player.velocity.Y = player.jumpSpeed;
             player.onGround = false;
             player.jumpTime = 0;
-        } else if (player.jumpTime < player.maxJumpTime) {
+        } else if (player.jumpTime < player.maxJumpTime)
+        {
             // Continue applying upward force if jump is held
             player.velocity.Y += player.jumpSpeed * deltaTime * 2;
             player.jumpTime += deltaTime;
         }
-    } else {
+    } else
+    {
         // If jump key is released, stop adding upward force
         player.jumpTime = player.maxJumpTime;
     }
 
 }
 
-function keyDown(event) {
+function keyDown(event)
+{
     let key = keyMap[event.keyCode];
-    if (key) {
+    if (key)
+    {
         keysPressed[key] = true;
     }
 }
 
-function keyUp(event) {
+function keyUp(event)
+{
     let key = keyMap[event.keyCode];
-    if (key) {
+    if (key)
+    {
         keysPressed[key] = false;
     }
 }
